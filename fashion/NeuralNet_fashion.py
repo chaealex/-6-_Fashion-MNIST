@@ -203,13 +203,15 @@ def run_manual(number, **options):
     return run_experiment(manual_config(number), name=f"수동 {number}", **options)
 
 
-def preset_cli(kind, number=None):
+def preset_cli(kind, number=None, *, config_overrides=None, title=None):
     if kind == "수동":
         name = f"수동 {number}"
     elif kind == "랜덤":
         name = f"랜덤 {number}"
     else:
         name = "장기 학습"
+    if title is not None:
+        name = title
     parser = argparse.ArgumentParser(description=f"{name} 후보 한 개 학습")
     parser.add_argument("--epochs", type=int, default=15 if kind == "수동" else 45)
     parser.add_argument("--batch-size", type=int, default=BATCH_SIZE)
@@ -220,11 +222,7 @@ def preset_cli(kind, number=None):
         parser.error("에폭과 배치 크기는 1 이상이어야 합니다.")
     options = dict(epochs=args.epochs, batch_size=args.batch_size,
                    data_dir=args.data_dir, show_plot=not args.no_plot)
-    if kind == "수동":
-        run_manual(number, **options)
-        return
-
-    config = manual_config(4)
+    config = manual_config(number if kind == "수동" else 4)
     if kind == "랜덤":
         data = prepare_data(args.data_dir)
         rng = data[-1]
@@ -232,6 +230,8 @@ def preset_cli(kind, number=None):
         for _ in range(number):
             config = random_config(rng, base)
         options["data"] = data
+    if config_overrides is not None:
+        config.update(config_overrides)
     run_experiment(config, name=name, **options)
 
 
@@ -332,3 +332,4 @@ def plot_history(history, best_epoch, training_size, batch_size, final_history=N
 
 if __name__ == "__main__":
     print("실행 파일: 수동1.py~수동5.py, 자동1.py~자동3.py, 장기학습.py, 자동.py, 실험설정.py")
+    print("L2·드롭아웃 미적용 비교: L2_드롭아웃_미적용.py")
