@@ -18,7 +18,7 @@ from common.optimizer import Adam
 
 SEED = 42
 BATCH_SIZE = 256
-LOG_INTERVAL = 50
+BATCH_LOG_INTERVAL = 50
 TARGET_ACCURACY = 0.90
 MANUAL_WIDTHS = ((256,), (128, 64), (384, 192), (320, 192, 96), (256, 192, 128, 96, 64))
 DEFAULT_DATA_DIR = HERE / "data" / "fashion"
@@ -57,7 +57,7 @@ def describe(config):
 
 
 def train(name, config, epochs, x_train, t_train, monitor, validation=None,
-          stop_epoch=None, *, batch_size=BATCH_SIZE):
+          stop_epoch=None, *, batch_size=BATCH_SIZE, log_every_batches=None):
     # 각 후보가 같은 난수 시드와 배치 순서를 사용하도록 맞춘다.
     np.random.seed(SEED)
     rng = np.random.default_rng(SEED)
@@ -88,12 +88,19 @@ def train(name, config, epochs, x_train, t_train, monitor, validation=None,
     steps_per_epoch = (len(t_train) + batch_size - 1) // batch_size
     run_epochs = stop_epoch if stop_epoch is not None else epochs
     total_steps = steps_per_epoch * run_epochs
+    if log_every_batches is None:
+        loss_window = steps_per_epoch
+        log_label = "1에폭마다"
+    else:
+        loss_window = log_every_batches
+        log_label = f"{log_every_batches}배치마다"
     batch_losses, log_steps, train_scores, val_scores = [], [], [], []
     epoch_scores = []
     best_key = (-1.0, float("-inf"))
     monitor_x, monitor_t = x_train[monitor], t_train[monitor]
     step = 0
-    print(f"\n[{name}] {describe(config)} | {run_epochs} epochs | batch size={batch_size}", flush=True)
+    print(f"\n[{name}] {describe(config)} | {run_epochs} epochs | batch size={batch_size} | 출력={log_label}",
+          flush=True)
     for epoch in range(1, run_epochs + 1):
         # 모든 후보에 같은 학습률 감소 규칙을 적용한다.
         progress = (epoch - 1) / epochs
@@ -106,8 +113,11 @@ def train(name, config, epochs, x_train, t_train, monitor, validation=None,
             batch_losses.append(network.last_layer.loss)
             optimizer.update(network.params, gradients)
             step += 1
-            log_now = step % LOG_INTERVAL == 0 or step == total_steps
             epoch_end = step % steps_per_epoch == 0
+            if log_every_batches is None:
+                log_now = epoch_end
+            else:
+                log_now = step % log_every_batches == 0 or step == total_steps
             if validation is not None and (log_now or epoch_end):
                 val_acc, val_loss = evaluate(network, *validation)
                 if epoch_end:
@@ -119,7 +129,7 @@ def train(name, config, epochs, x_train, t_train, monitor, validation=None,
                 train_acc = network.accuracy(monitor_x, monitor_t)
                 log_steps.append(step)
                 train_scores.append(train_acc)
-                recent_loss = np.mean(batch_losses[-LOG_INTERVAL:])
+                recent_loss = np.mean(batch_losses[-loss_window:])
                 validation_log = ""
                 if validation is not None:
                     val_scores.append(val_acc)
@@ -145,7 +155,7 @@ def prepare_data(data_dir):
     split = len(order) // 10
     x_val, t_val = x[order[:split]], t[order[:split]]
     x_train, t_train = x[order[split:]], t[order[split:]]
-    # 50배치마다 고정된 학습 표본 2,000장과 검증 전체를 평가한다.
+    # 진행 출력에는 고정된 학습 표본 2,000장과 검증 전체를 사용한다.
     monitor = rng.choice(len(t_train), min(2000, len(t_train)), replace=False)
     print(f"Fashion-MNIST | 학습 {len(t_train):,}장 | 검증 {len(t_val):,}장")
     return (x, t), (x_train, t_train), (x_val, t_val), monitor, rng
@@ -170,7 +180,7 @@ def random_config(rng, base):
 
 
 def run_experiment(config, *, epochs=15, batch_size=BATCH_SIZE, data_dir=DEFAULT_DATA_DIR,
-                   name="직접 설정", show_plot=True, data=None):
+                   name="직접 설정", show_plot=True, data=None, log_every_batches=None):
     """한 가지 설정을 학습하고 검증 결과와 학습 기록을 반환한다."""
     hidden = config["hidden"]
     if not 1 <= len(hidden) <= 5 or any(
@@ -179,6 +189,8 @@ def run_experiment(config, *, epochs=15, batch_size=BATCH_SIZE, data_dir=DEFAULT
         raise ValueError("은닉층은 1~5개, 층별 노드 수는 1 이상이어야 합니다.")
     if epochs < 1 or batch_size < 1:
         raise ValueError("에폭과 배치 크기는 1 이상이어야 합니다.")
+    if log_every_batches is not None and log_every_batches < 1:
+        raise ValueError("배치 출력 간격은 1 이상이어야 합니다.")
     if not np.isfinite(config["l2"]) or config["l2"] < 0:
         raise ValueError("L2는 유한한 0 이상의 값이어야 합니다.")
     if not 0 <= config["dropout"] < 1:
@@ -190,7 +202,8 @@ def run_experiment(config, *, epochs=15, batch_size=BATCH_SIZE, data_dir=DEFAULT
     if data is None:
         data = prepare_data(Path(data_dir))
     _, training, validation, monitor, _ = data
-    result = train(name, config, epochs, *training, monitor, validation=validation, batch_size=batch_size)
+    result = train(name, config, epochs, *training, monitor, validation=validation,
+                   batch_size=batch_size, log_every_batches=log_every_batches)
     history, best_epoch, accuracy, loss = result
     print(f"최고 검증 정확도={accuracy:.2%} | 손실={loss:.4f} | 에폭={best_epoch}/{epochs}")
     print(f"실행 시간={perf_counter() - started:.1f}초", flush=True)

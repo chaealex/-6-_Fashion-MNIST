@@ -4,7 +4,7 @@ import argparse
 import math
 from pathlib import Path
 
-from NeuralNet_fashion import BATCH_SIZE, DEFAULT_DATA_DIR, describe, run_experiment
+from NeuralNet_fashion import BATCH_LOG_INTERVAL, BATCH_SIZE, DEFAULT_DATA_DIR, describe, run_experiment
 
 
 def ask(label, default, parse, valid, hint):
@@ -46,10 +46,13 @@ def main():
         epochs = ask("에폭", 15, int, lambda n: n > 0, "1 이상의 정수를 입력하세요.")
         lr = ask("초기 학습률", 0.00127, float, lambda n: math.isfinite(n) and n > 0,
                  "유한한 양수를 입력하세요.")
+        log_mode = ask(f"출력 간격 (1: 1에폭마다, 2: {BATCH_LOG_INTERVAL}배치마다)",
+                       1, int, lambda n: n in (1, 2), "1 또는 2를 입력하세요.")
         config = dict(hidden=widths, l2=l2, dropout=dropout, lr=lr)
         print(f"\n선택 설정: {describe(config)} | 배치={batch_size} | 에폭={epochs}")
         run_experiment(config, epochs=epochs, batch_size=batch_size, data_dir=args.data_dir,
-                       show_plot=not args.no_plot)
+                       show_plot=not args.no_plot,
+                       log_every_batches=BATCH_LOG_INTERVAL if log_mode == 2 else None)
     except (EOFError, KeyboardInterrupt):
         print("\n실험을 종료합니다.")
 
