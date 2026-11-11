@@ -13,7 +13,7 @@ import numpy as np
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 from common.multi_layer_net_extend import MultiLayerNetExtend
-from common.optimizer import Adam
+from common.optimizer import Adam, AdaGrad  # ← 수정: AdaGrad 추가
 
 
 SEED = 42
@@ -22,8 +22,11 @@ BATCH_LOG_INTERVAL = 50
 TARGET_ACCURACY = 0.90
 MANUAL_WIDTHS = ((256,), (128, 64), (384, 192), (320, 192, 96), (256, 192, 128, 96, 64))
 DEFAULT_DATA_DIR = HERE / "data" / "fashion"
-if not DEFAULT_DATA_DIR.is_dir():
-    DEFAULT_DATA_DIR = HERE.parent / "Fashion_mnist" / "data" / "fashion"
+DEFAULT_DATA_DIR = HERE / "data" / "fashion"
+for candidate in (HERE.parent / "data" / "fashion",
+                  HERE.parent / "Fashion_mnist" / "data" / "fashion"):
+    if not DEFAULT_DATA_DIR.is_dir() and candidate.is_dir():
+        DEFAULT_DATA_DIR = candidate
 
 
 def load_fashion(data_dir, kind):
@@ -50,8 +53,10 @@ def evaluate(network, x, t):
 
 def describe(config):
     shape = " → ".join(map(str, [784, *config["hidden"], 10]))
+    # ← 수정: optimizer 이름을 로그에 표시
+    optimizer_name = "AdaGrad" if config.get("optimizer") == "adagrad" else "Adam"
     return (
-        f"{shape} ({len(config['hidden']) + 1}층), ReLU, Adam, "
+        f"{shape} ({len(config['hidden']) + 1}층), ReLU, {optimizer_name}, "
         f"lr={config['lr']:.5g}, L2={config['l2']:.5g}, dropout={config['dropout']:.2f}"
     )
 
@@ -83,7 +88,12 @@ def train(name, config, epochs, x_train, t_train, monitor, validation=None,
     for index in range(1, len(config["hidden"]) + 2):
         layer = network.layers[f"Affine{index}"]
         layer.W, layer.b = network.params[f"W{index}"], network.params[f"b{index}"]
-    optimizer = Adam(lr=config["lr"])
+
+    # ← 수정: config["optimizer"]가 "adagrad"이면 AdaGrad, 아니면 기존처럼 Adam
+    if config.get("optimizer") == "adagrad":
+        optimizer = AdaGrad(lr=config["lr"])
+    else:
+        optimizer = Adam(lr=config["lr"])
 
     steps_per_epoch = (len(t_train) + batch_size - 1) // batch_size
     run_epochs = stop_epoch if stop_epoch is not None else epochs
