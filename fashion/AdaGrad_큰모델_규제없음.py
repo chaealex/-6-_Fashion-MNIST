@@ -12,5 +12,5 @@ if __name__ == "__main__":
             "l2": 0.0,
             "dropout": 0.0,
         },
-        title="AdaGrad 큰 모델 (규제 없음)",
+        title="AdaGrad 큰 모델 (L2·드롭아웃 미적용)",
     )

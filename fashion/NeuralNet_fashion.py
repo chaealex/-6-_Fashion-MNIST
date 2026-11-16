@@ -13,7 +13,7 @@ import numpy as np
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 from common.multi_layer_net_extend import MultiLayerNetExtend
-from common.optimizer import Adam, AdaGrad  # ← 수정: AdaGrad 추가
+from common.optimizer import Adam, AdaGrad, Momentum, SGD
 
 
 SEED = 42
@@ -21,7 +21,6 @@ BATCH_SIZE = 256
 BATCH_LOG_INTERVAL = 50
 TARGET_ACCURACY = 0.90
 MANUAL_WIDTHS = ((256,), (128, 64), (384, 192), (320, 192, 96), (256, 192, 128, 96, 64))
-DEFAULT_DATA_DIR = HERE / "data" / "fashion"
 DEFAULT_DATA_DIR = HERE / "data" / "fashion"
 for candidate in (HERE.parent / "data" / "fashion",
                   HERE.parent / "Fashion_mnist" / "data" / "fashion"):
@@ -53,11 +52,12 @@ def evaluate(network, x, t):
 
 def describe(config):
     shape = " → ".join(map(str, [784, *config["hidden"], 10]))
-    # ← 수정: optimizer 이름을 로그에 표시
-    optimizer_name = "AdaGrad" if config.get("optimizer") == "adagrad" else "Adam"
+    optimizer_name = config.get("optimizer", "adam")
     return (
         f"{shape} ({len(config['hidden']) + 1}층), ReLU, {optimizer_name}, "
-        f"lr={config['lr']:.5g}, L2={config['l2']:.5g}, dropout={config['dropout']:.2f}"
+        f"lr={config['lr']:.5g}, L2={config['l2']:.5g}, dropout={config['dropout']:.2f}, "
+        f"init={config.get('init', 'he')}, BN={config.get('batchnorm', True)}, "
+        f"schedule={config.get('schedule', 'cosine')}"
     )
 
 
@@ -71,16 +71,18 @@ def train(name, config, epochs, x_train, t_train, monitor, validation=None,
         hidden_size_list=list(config["hidden"]),
         output_size=10,
         activation="relu",
-        weight_init_std="he",
+        weight_init_std=config.get("init", "he"),
         weight_decay_lambda=config["l2"],
         use_dropout=config["dropout"] > 0,
         dropout_ration=config["dropout"],
-        use_batchnorm=True,
+        use_batchnorm=config.get("batchnorm", True),
     )
     # 교재 계층에서 가중치를 참조하므로 양쪽을 같은 float32 배열에 연결한다.
     for key, value in network.params.items():
         network.params[key] = value.astype(np.float32)
     for index, size in enumerate(config["hidden"], 1):
+        if not config.get("batchnorm", True):
+            continue
         bn = network.layers[f"BatchNorm{index}"]
         bn.gamma, bn.beta = network.params[f"gamma{index}"], network.params[f"beta{index}"]
         bn.running_mean = np.zeros(size, dtype=np.float32)
@@ -89,11 +91,9 @@ def train(name, config, epochs, x_train, t_train, monitor, validation=None,
         layer = network.layers[f"Affine{index}"]
         layer.W, layer.b = network.params[f"W{index}"], network.params[f"b{index}"]
 
-    # ← 수정: config["optimizer"]가 "adagrad"이면 AdaGrad, 아니면 기존처럼 Adam
-    if config.get("optimizer") == "adagrad":
-        optimizer = AdaGrad(lr=config["lr"])
-    else:
-        optimizer = Adam(lr=config["lr"])
+    optimizer = {"adam": Adam, "adagrad": AdaGrad, "momentum": Momentum, "sgd": SGD}[
+        config.get("optimizer", "adam")
+    ](lr=config["lr"])
 
     steps_per_epoch = (len(t_train) + batch_size - 1) // batch_size
     run_epochs = stop_epoch if stop_epoch is not None else epochs
@@ -112,9 +112,9 @@ def train(name, config, epochs, x_train, t_train, monitor, validation=None,
     print(f"\n[{name}] {describe(config)} | {run_epochs} epochs | batch size={batch_size} | 출력={log_label}",
           flush=True)
     for epoch in range(1, run_epochs + 1):
-        # 모든 후보에 같은 학습률 감소 규칙을 적용한다.
-        progress = (epoch - 1) / epochs
-        optimizer.lr = config["lr"] * (0.1 + 0.9 * (1 + np.cos(np.pi * progress)) / 2)
+        if config.get("schedule", "cosine") == "cosine":
+            progress = (epoch - 1) / epochs
+            optimizer.lr = config["lr"] * (0.1 + 0.9 * (1 + np.cos(np.pi * progress)) / 2)
         order = rng.permutation(len(t_train))
         for start in range(0, len(order), batch_size):
             batch = order[start:start + batch_size]
@@ -146,7 +146,7 @@ def train(name, config, epochs, x_train, t_train, monitor, validation=None,
                     validation_log = f" | val={val_acc:.2%} | val loss={val_loss:.4f}"
                 print(
                     f"batch {step:>5}/{total_steps} | epoch {epoch:>2}/{run_epochs} | "
-                    f"loss={recent_loss:.4f} | train(표본)={train_acc:.2%}{validation_log}",
+                    f"CE={recent_loss:.4f} | train(표본)={train_acc:.2%}{validation_log}",
                     flush=True,
                 )
     history = (batch_losses, log_steps, train_scores, val_scores)
@@ -207,11 +207,24 @@ def run_experiment(config, *, epochs=15, batch_size=BATCH_SIZE, data_dir=DEFAULT
         raise ValueError("드롭아웃은 0 이상 1 미만이어야 합니다.")
     if not np.isfinite(config["lr"]) or config["lr"] <= 0:
         raise ValueError("학습률은 유한한 양수여야 합니다.")
+    init = config.get("init", "he")
+    if init not in ("he", "xavier") and not (
+        isinstance(init, (int, float)) and np.isfinite(init) and init > 0
+    ):
+        raise ValueError("초기화는 he, xavier 또는 양의 표준편차여야 합니다.")
+    if config.get("optimizer", "adam") not in ("adam", "adagrad", "momentum", "sgd"):
+        raise ValueError("최적화 방법은 adam, adagrad, momentum, sgd 중 선택하세요.")
+    if config.get("schedule", "cosine") not in ("cosine", "constant"):
+        raise ValueError("학습률 방식은 cosine 또는 constant 중 선택하세요.")
 
     started = perf_counter()
     if data is None:
         data = prepare_data(Path(data_dir))
     _, training, validation, monitor, _ = data
+    if config.get("batchnorm", True) and (
+        batch_size < 2 or len(training[1]) % batch_size == 1
+    ):
+        raise ValueError("배치 정규화 사용 시 각 배치가 2장 이상이 되도록 배치 크기를 설정하세요.")
     result = train(name, config, epochs, *training, monitor, validation=validation,
                    batch_size=batch_size, log_every_batches=log_every_batches)
     history, best_epoch, accuracy, loss = result
@@ -356,3 +369,4 @@ def plot_history(history, best_epoch, training_size, batch_size, final_history=N
 if __name__ == "__main__":
     print("실행 파일: 수동1.py~수동5.py, 자동1.py~자동3.py, 장기학습.py, 자동.py, 실험설정.py")
     print("L2·드롭아웃 미적용 비교: L2_드롭아웃_미적용.py")
+    print("12주차 비교: 12주차_최적화.py, 12주차_초기화.py, 12주차_배치정규화.py, 12주차_비교.py")

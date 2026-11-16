@@ -1,0 +1,445 @@
+{
+  "stage": "all",
+  "seed": 42,
+  "batch_size": 256,
+  "candidates": [
+    {
+      "name": "optimizer-sgd-0.01",
+      "config": {
+        "hidden": [
+          256,
+          128,
+          64
+        ],
+        "optimizer": "sgd",
+        "lr": 0.01,
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "epochs": 15,
+      "best_epoch": 15,
+      "val_accuracy": 0.871,
+      "val_cross_entropy": 0.35286083984375
+    },
+    {
+      "name": "optimizer-sgd-0.05",
+      "config": {
+        "hidden": [
+          256,
+          128,
+          64
+        ],
+        "optimizer": "sgd",
+        "lr": 0.05,
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "epochs": 15,
+      "best_epoch": 15,
+      "val_accuracy": 0.8926666666666667,
+      "val_cross_entropy": 0.30246307373046877
+    },
+    {
+      "name": "optimizer-momentum-0.01",
+      "config": {
+        "hidden": [
+          256,
+          128,
+          64
+        ],
+        "optimizer": "momentum",
+        "lr": 0.01,
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "epochs": 15,
+      "best_epoch": 11,
+      "val_accuracy": 0.8955,
+      "val_cross_entropy": 0.2943078053792318
+    },
+    {
+      "name": "optimizer-momentum-0.03",
+      "config": {
+        "hidden": [
+          256,
+          128,
+          64
+        ],
+        "optimizer": "momentum",
+        "lr": 0.03,
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "epochs": 15,
+      "best_epoch": 12,
+      "val_accuracy": 0.894,
+      "val_cross_entropy": 0.3141824340820312
+    },
+    {
+      "name": "optimizer-adagrad-0.01",
+      "config": {
+        "hidden": [
+          256,
+          128,
+          64
+        ],
+        "optimizer": "adagrad",
+        "lr": 0.01,
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "epochs": 15,
+      "best_epoch": 12,
+      "val_accuracy": 0.898,
+      "val_cross_entropy": 0.29115281677246097
+    },
+    {
+      "name": "optimizer-adagrad-0.05",
+      "config": {
+        "hidden": [
+          256,
+          128,
+          64
+        ],
+        "optimizer": "adagrad",
+        "lr": 0.05,
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "epochs": 15,
+      "best_epoch": 13,
+      "val_accuracy": 0.9056666666666666,
+      "val_cross_entropy": 0.28538072458902997
+    },
+    {
+      "name": "optimizer-adam-0.0005",
+      "config": {
+        "hidden": [
+          256,
+          128,
+          64
+        ],
+        "optimizer": "adam",
+        "lr": 0.0005,
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "epochs": 15,
+      "best_epoch": 8,
+      "val_accuracy": 0.8998333333333334,
+      "val_cross_entropy": 0.28922614034016925
+    },
+    {
+      "name": "optimizer-adam-0.001",
+      "config": {
+        "hidden": [
+          256,
+          128,
+          64
+        ],
+        "optimizer": "adam",
+        "lr": 0.001,
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "epochs": 15,
+      "best_epoch": 8,
+      "val_accuracy": 0.8981666666666667,
+      "val_cross_entropy": 0.29518075052897136
+    },
+    {
+      "name": "init-0.01-BN-False",
+      "config": {
+        "hidden": [
+          256,
+          128,
+          64
+        ],
+        "optimizer": "adagrad",
+        "lr": 0.05,
+        "init": 0.01,
+        "batchnorm": false,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "epochs": 15,
+      "best_epoch": 15,
+      "val_accuracy": 0.891,
+      "val_cross_entropy": 0.3024235127766927
+    },
+    {
+      "name": "init-xavier-BN-False",
+      "config": {
+        "hidden": [
+          256,
+          128,
+          64
+        ],
+        "optimizer": "adagrad",
+        "lr": 0.05,
+        "init": "xavier",
+        "batchnorm": false,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "epochs": 15,
+      "best_epoch": 15,
+      "val_accuracy": 0.8901666666666667,
+      "val_cross_entropy": 0.30009437052408855
+    },
+    {
+      "name": "init-he-BN-False",
+      "config": {
+        "hidden": [
+          256,
+          128,
+          64
+        ],
+        "optimizer": "adagrad",
+        "lr": 0.05,
+        "init": "he",
+        "batchnorm": false,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "epochs": 15,
+      "best_epoch": 15,
+      "val_accuracy": 0.8926666666666667,
+      "val_cross_entropy": 0.29962959798177086
+    },
+    {
+      "name": "init-0.01-BN-True",
+      "config": {
+        "hidden": [
+          256,
+          128,
+          64
+        ],
+        "optimizer": "adagrad",
+        "lr": 0.05,
+        "init": 0.01,
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "epochs": 15,
+      "best_epoch": 12,
+      "val_accuracy": 0.9033333333333333,
+      "val_cross_entropy": 0.2781194152832031
+    },
+    {
+      "name": "init-xavier-BN-True",
+      "config": {
+        "hidden": [
+          256,
+          128,
+          64
+        ],
+        "optimizer": "adagrad",
+        "lr": 0.05,
+        "init": "xavier",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "epochs": 15,
+      "best_epoch": 12,
+      "val_accuracy": 0.9006666666666666,
+      "val_cross_entropy": 0.29531269836425783
+    },
+    {
+      "name": "init-he-BN-True",
+      "config": {
+        "hidden": [
+          256,
+          128,
+          64
+        ],
+        "optimizer": "adagrad",
+        "lr": 0.05,
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "epochs": 15,
+      "best_epoch": 13,
+      "val_accuracy": 0.9056666666666666,
+      "val_cross_entropy": 0.28538072458902997
+    },
+    {
+      "name": "structure-[256, 128, 64]",
+      "config": {
+        "hidden": [
+          256,
+          128,
+          64
+        ],
+        "optimizer": "adagrad",
+        "lr": 0.05,
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "epochs": 35,
+      "best_epoch": 13,
+      "val_accuracy": 0.9056666666666666,
+      "val_cross_entropy": 0.28538072458902997
+    },
+    {
+      "name": "structure-[480, 288, 144]",
+      "config": {
+        "hidden": [
+          480,
+          288,
+          144
+        ],
+        "optimizer": "adagrad",
+        "lr": 0.05,
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "epochs": 35,
+      "best_epoch": 18,
+      "val_accuracy": 0.9023333333333333,
+      "val_cross_entropy": 0.3435004628499349
+    },
+    {
+      "name": "structure-[512, 256]",
+      "config": {
+        "hidden": [
+          512,
+          256
+        ],
+        "optimizer": "adagrad",
+        "lr": 0.05,
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "epochs": 35,
+      "best_epoch": 29,
+      "val_accuracy": 0.9063333333333333,
+      "val_cross_entropy": 0.39742017110188804
+    },
+    {
+      "name": "random-lr-1",
+      "config": {
+        "hidden": [
+          512,
+          256
+        ],
+        "optimizer": "adagrad",
+        "lr": 0.02672583236869186,
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "epochs": 35,
+      "best_epoch": 18,
+      "val_accuracy": 0.9061666666666667,
+      "val_cross_entropy": 0.3041970189412435
+    },
+    {
+      "name": "random-lr-2",
+      "config": {
+        "hidden": [
+          512,
+          256
+        ],
+        "optimizer": "adagrad",
+        "lr": 0.0461141259112534,
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "epochs": 35,
+      "best_epoch": 27,
+      "val_accuracy": 0.9053333333333333,
+      "val_cross_entropy": 0.3943118438720703
+    },
+    {
+      "name": "random-lr-3",
+      "config": {
+        "hidden": [
+          512,
+          256
+        ],
+        "optimizer": "adagrad",
+        "lr": 0.020544386740218967,
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "epochs": 35,
+      "best_epoch": 13,
+      "val_accuracy": 0.9045,
+      "val_cross_entropy": 0.28343629964192707
+    }
+  ],
+  "selected": {
+    "name": "structure-[512, 256]",
+    "config": {
+      "hidden": [
+        512,
+        256
+      ],
+      "optimizer": "adagrad",
+      "lr": 0.05,
+      "init": "he",
+      "batchnorm": true,
+      "schedule": "constant",
+      "l2": 0.0,
+      "dropout": 0.0
+    },
+    "epochs": 35,
+    "best_epoch": 29,
+    "val_accuracy": 0.9063333333333333,
+    "val_cross_entropy": 0.39742017110188804
+  },
+  "test_accuracy": 0.8927,
+  "test_cross_entropy": 0.5133335754394531
+}

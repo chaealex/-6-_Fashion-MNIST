@@ -38,17 +38,27 @@ def main():
             lambda values: len(values) == depth and all(value > 0 for value in values),
             f"1 이상의 정수를 정확히 {depth}개 입력하세요.",
         )
-        l2 = ask("L2 계수 (예: 8.4e-6)", "8.4e-6", float,
+        l2 = ask("L2 계수 (12주차 비교 기본값 0)", "0", float,
                  lambda n: math.isfinite(n) and n >= 0, "L2는 유한한 0 이상의 수를 입력하세요.")
-        dropout = ask("드롭아웃 비율 (예: 0.2 = 20%)", 0.2, float, lambda n: 0 <= n < 1,
+        dropout = ask("드롭아웃 비율 (12주차 비교 기본값 0)", 0.0, float, lambda n: 0 <= n < 1,
                       "드롭아웃은 0 이상 1 미만의 소수로 입력하세요.")
         batch_size = ask("배치 크기", BATCH_SIZE, int, lambda n: n > 0, "1 이상의 정수를 입력하세요.")
         epochs = ask("에폭", 15, int, lambda n: n > 0, "1 이상의 정수를 입력하세요.")
         lr = ask("초기 학습률", 0.00127, float, lambda n: math.isfinite(n) and n > 0,
                  "유한한 양수를 입력하세요.")
+        optimizer = ask("최적화 방법 (adam/adagrad/momentum/sgd)", "adam", str.lower,
+                        lambda s: s in ("adam", "adagrad", "momentum", "sgd"), "지원하는 이름을 입력하세요.")
+        init = ask("초기화 (he/xavier/0.01)", "he",
+                   lambda s: 0.01 if s == "0.01" else s.lower(),
+                   lambda s: s in ("he", "xavier", 0.01), "he, xavier, 0.01 중 입력하세요.")
+        batchnorm = ask("배치 정규화 (1: 사용, 0: 미사용)", 1, int, lambda n: n in (0, 1),
+                        "0 또는 1을 입력하세요.")
+        schedule = ask("학습률 방식 (constant/cosine)", "constant", str.lower,
+                       lambda s: s in ("constant", "cosine"), "constant 또는 cosine을 입력하세요.")
         log_mode = ask(f"출력 간격 (1: 1에폭마다, 2: {BATCH_LOG_INTERVAL}배치마다)",
                        1, int, lambda n: n in (1, 2), "1 또는 2를 입력하세요.")
-        config = dict(hidden=widths, l2=l2, dropout=dropout, lr=lr)
+        config = dict(hidden=widths, l2=l2, dropout=dropout, lr=lr, optimizer=optimizer,
+                      init=init, batchnorm=bool(batchnorm), schedule=schedule)
         print(f"\n선택 설정: {describe(config)} | 배치={batch_size} | 에폭={epochs}")
         run_experiment(config, epochs=epochs, batch_size=batch_size, data_dir=args.data_dir,
                        show_plot=not args.no_plot,
