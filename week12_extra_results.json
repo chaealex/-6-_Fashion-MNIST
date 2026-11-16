@@ -1,0 +1,292 @@
+{
+  "seed": 42,
+  "candidates": [
+    {
+      "name": "manual-1",
+      "config": {
+        "optimizer": "adagrad",
+        "lr": 0.025,
+        "hidden": [
+          256,
+          128,
+          64
+        ],
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "batch_size": 64,
+      "epochs": 20,
+      "best_epoch": 13,
+      "val_accuracy": 0.9075,
+      "val_cross_entropy": 0.26965733083089194
+    },
+    {
+      "name": "manual-2",
+      "config": {
+        "optimizer": "adagrad",
+        "lr": 0.025,
+        "hidden": [
+          256,
+          128,
+          64
+        ],
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "batch_size": 128,
+      "epochs": 20,
+      "best_epoch": 15,
+      "val_accuracy": 0.902,
+      "val_cross_entropy": 0.3010124206542969
+    },
+    {
+      "name": "manual-3",
+      "config": {
+        "optimizer": "adagrad",
+        "lr": 0.025,
+        "hidden": [
+          256,
+          128,
+          64
+        ],
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "batch_size": 512,
+      "epochs": 20,
+      "best_epoch": 18,
+      "val_accuracy": 0.8995,
+      "val_cross_entropy": 0.32217413330078126
+    },
+    {
+      "name": "manual-4",
+      "config": {
+        "optimizer": "adagrad",
+        "lr": 0.01,
+        "hidden": [
+          256,
+          128,
+          64
+        ],
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "batch_size": 128,
+      "epochs": 20,
+      "best_epoch": 15,
+      "val_accuracy": 0.9046666666666666,
+      "val_cross_entropy": 0.27848406982421875
+    },
+    {
+      "name": "manual-5",
+      "config": {
+        "optimizer": "adagrad",
+        "lr": 0.05,
+        "hidden": [
+          256,
+          128,
+          64
+        ],
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "batch_size": 128,
+      "epochs": 20,
+      "best_epoch": 13,
+      "val_accuracy": 0.9041666666666667,
+      "val_cross_entropy": 0.2921726226806641
+    },
+    {
+      "name": "manual-6",
+      "config": {
+        "optimizer": "adagrad",
+        "lr": 0.025,
+        "hidden": [
+          128,
+          64
+        ],
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "batch_size": 128,
+      "epochs": 20,
+      "best_epoch": 13,
+      "val_accuracy": 0.902,
+      "val_cross_entropy": 0.2743266042073568
+    },
+    {
+      "name": "manual-7",
+      "config": {
+        "optimizer": "adagrad",
+        "lr": 0.025,
+        "hidden": [
+          512,
+          256
+        ],
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "batch_size": 128,
+      "epochs": 20,
+      "best_epoch": 17,
+      "val_accuracy": 0.9033333333333333,
+      "val_cross_entropy": 0.31670877583821616
+    },
+    {
+      "name": "manual-8",
+      "config": {
+        "optimizer": "adam",
+        "lr": 0.0003,
+        "hidden": [
+          256,
+          128,
+          64
+        ],
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "batch_size": 128,
+      "epochs": 20,
+      "best_epoch": 13,
+      "val_accuracy": 0.9,
+      "val_cross_entropy": 0.2921055170694987
+    },
+    {
+      "name": "random-1",
+      "config": {
+        "optimizer": "adagrad",
+        "lr": 0.016837984992961234,
+        "hidden": [
+          192,
+          96,
+          48
+        ],
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "batch_size": 256,
+      "epochs": 20,
+      "best_epoch": 13,
+      "val_accuracy": 0.9018333333333334,
+      "val_cross_entropy": 0.29172107950846354
+    },
+    {
+      "name": "random-2",
+      "config": {
+        "optimizer": "adagrad",
+        "lr": 0.03511150799027698,
+        "hidden": [
+          256,
+          128,
+          64
+        ],
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "batch_size": 64,
+      "epochs": 20,
+      "best_epoch": 18,
+      "val_accuracy": 0.9035,
+      "val_cross_entropy": 0.2995436808268229
+    },
+    {
+      "name": "random-3",
+      "config": {
+        "optimizer": "adagrad",
+        "lr": 0.026610336540781234,
+        "hidden": [
+          192,
+          96,
+          48
+        ],
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "batch_size": 256,
+      "epochs": 20,
+      "best_epoch": 13,
+      "val_accuracy": 0.9016666666666666,
+      "val_cross_entropy": 0.2852106730143229
+    },
+    {
+      "name": "random-4",
+      "config": {
+        "optimizer": "adagrad",
+        "lr": 0.016397978605106275,
+        "hidden": [
+          192,
+          96,
+          48
+        ],
+        "init": "he",
+        "batchnorm": true,
+        "schedule": "constant",
+        "l2": 0.0,
+        "dropout": 0.0
+      },
+      "batch_size": 512,
+      "epochs": 20,
+      "best_epoch": 20,
+      "val_accuracy": 0.8926666666666667,
+      "val_cross_entropy": 0.361675542195638
+    }
+  ],
+  "selected": {
+    "name": "manual-1",
+    "config": {
+      "optimizer": "adagrad",
+      "lr": 0.025,
+      "hidden": [
+        256,
+        128,
+        64
+      ],
+      "init": "he",
+      "batchnorm": true,
+      "schedule": "constant",
+      "l2": 0.0,
+      "dropout": 0.0
+    },
+    "batch_size": 64,
+    "epochs": 20,
+    "best_epoch": 13,
+    "val_accuracy": 0.9075,
+    "val_cross_entropy": 0.26965733083089194
+  },
+  "final_method": "best_validation_checkpoint_54000",
+  "test_accuracy": 0.8926,
+  "test_cross_entropy": 0.3297171630859375
+}

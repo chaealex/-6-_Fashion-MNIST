@@ -62,7 +62,7 @@ def describe(config):
 
 
 def train(name, config, epochs, x_train, t_train, monitor, validation=None,
-          stop_epoch=None, *, batch_size=BATCH_SIZE, log_every_batches=None):
+          stop_epoch=None, *, batch_size=BATCH_SIZE, log_every_batches=None, checkpoint_path=None):
     # 각 후보가 같은 난수 시드와 배치 순서를 사용하도록 맞춘다.
     np.random.seed(SEED)
     rng = np.random.default_rng(SEED)
@@ -135,6 +135,9 @@ def train(name, config, epochs, x_train, t_train, monitor, validation=None,
                     key = (val_acc, -val_loss)
                     if key > best_key:
                         best_key, best_epoch = key, epoch
+                        if checkpoint_path is not None:
+                            with Path(checkpoint_path).open("wb") as file:
+                                pickle.dump(network, file, protocol=pickle.HIGHEST_PROTOCOL)
             if log_now:
                 train_acc = network.accuracy(monitor_x, monitor_t)
                 log_steps.append(step)
