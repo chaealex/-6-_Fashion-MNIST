@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 fashion/results_week12/
 fashion/results_week12_extra/
+fashion/results_adam_adagrad_week12/
